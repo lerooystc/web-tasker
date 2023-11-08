@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Title</title>
+</head>
+<body>
+<button id="login" onclick="location.href = '/login'">Login</button>
+<h1 id="h1">User boards:</h1>
+<div id="boards"></div>
+</body>
+<script>
+    async function test(url) {
+        const response = await fetch(url);
+        if (response.status != 401) {
+            const login = document.getElementById("login");
+            login.innerHTML = "Logout";
+            login.setAttribute('onclick', 'location.href = "/logout"');
+            const boards = await response.json();
+            const element = document.getElementById("boards");
+            const fragment = document.createDocumentFragment();
+
+            boards.forEach((board) => {
+              const h2 = document.createElement("h2");
+              const p = document.createElement("p");
+              h2.innerHTML = board.title;
+              p.innerHTML = board.description;
+              fragment.appendChild(h2);
+              fragment.appendChild(p);
+              board.columns.forEach((element) => {
+                  const p2 = document.createElement("p");
+                  p2.innerHTML = element.title;
+                  fragment.appendChild(p2);
+              })
+            });
+
+            element.appendChild(fragment);
+        }
+        else {
+            document.getElementById("h1").innerHTML = "Please log in!";
+        }
+    }
+
+
+    const url = "http://127.0.0.1:8000/api/user-boards/";
+    test(url);
+
+</script>
+</html>
