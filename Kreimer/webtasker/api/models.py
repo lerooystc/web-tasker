@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
 import random
 import string
 
@@ -43,7 +42,7 @@ class Task(models.Model):
     color = models.IntegerField()
     priority = models.IntegerField()
     finish_by = models.DateTimeField()
-    taken_by = models.ForeignKey("auth.User", on_delete=models.CASCADE, default=None, null=True)
+    taken_by = models.ForeignKey("auth.User", on_delete=models.CASCADE, default=None, blank=True, null=True)
 
     def __str__(self):
         return self.title

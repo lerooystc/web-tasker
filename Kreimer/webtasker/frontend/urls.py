@@ -5,6 +5,4 @@ from django.conf import settings
 
 urlpatterns = [
     path('', index, name='index'),
-    path('logout/', LogoutView.as_view(next_page=settings.LOGOUT_REDIRECT_URL), name='logout'),
-    path('login', LoginView.as_view(template_name='admin/login.html'))
 ]
