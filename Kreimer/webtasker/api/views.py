@@ -4,6 +4,7 @@ from django.shortcuts import render, get_object_or_404, get_list_or_404
 from rest_framework import generics, status
 from .serializers import *
 from .models import Board, Column, Task
+from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -11,19 +12,16 @@ from rest_framework.response import Response
 # Create your views here.
 
 
-class GetBoards(generics.ListAPIView):
+class BoardViewSet(viewsets.ModelViewSet):
     queryset = Board.objects.select_related('id_user').prefetch_related('members', 'columns', 'columns__tasks')
     serializer_class = BoardSerializer
+    create_serializer_class = CreateBoardSerializer
 
-
-class CreateBoardView(APIView):
-    serializer_class = CreateBoardSerializer
-
-    def post(self, request):
+    def create(self, request):
         if not self.request.session.exists(self.request.session.session_key):
             self.request.session.create()
 
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.create_serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
             title = serializer.data.get('title')
             description = serializer.data.get('description')
@@ -43,10 +41,11 @@ class CreateBoardView(APIView):
         return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class CreateColumnView(APIView):
+class ColumnViewSet(viewsets.ModelViewSet):
+    queryset = Column.objects.prefetch_related('tasks')
     serializer_class = CreateColumnSerializer
 
-    def post(self, request):
+    def create(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
             title = serializer.data.get('title')
@@ -65,10 +64,11 @@ class CreateColumnView(APIView):
         return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class CreateTaskView(APIView):
+class TaskViewSet(viewsets.ModelViewSet):
+    queryset = Task.objects.all()
     serializer_class = CreateTaskSerializer
 
-    def post(self, request):
+    def create(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
             id_column = serializer.data.get('id_column')
@@ -91,34 +91,6 @@ class CreateTaskView(APIView):
         return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class GetColumnTasks(generics.ListAPIView):
-    queryset = Task.objects.all()
-    serializer_class = TaskSerializer
-
-    def list(self, request, *args, **kwargs):
-        column = get_object_or_404(Column, id=self.kwargs['pk'])
-        if column:
-            queryset = column.tasks.all()
-            serializer = TaskSerializer(queryset, many=True)
-            return Response(serializer.data)
-        else:
-            return Response({'Bad Request': 'Please pass the parameter'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-class GetBoardColumns(generics.ListAPIView):
-    queryset = Column.objects.prefetch_related('tasks')
-    serializer_class = ColumnSerializer
-
-    def list(self, request, *args, **kwargs):
-        board = get_object_or_404(Board, id=self.kwargs['pk'])
-        if board:
-            queryset = board.columns.prefetch_related('tasks')
-            serializer = ColumnSerializer(queryset, many=True)
-            return Response(serializer.data)
-        else:
-            return Response({'Bad Request': 'Please pass the parameter'}, status=status.HTTP_400_BAD_REQUEST)
-
-
 class GetUserBoards(generics.ListAPIView):
     permission_classes = [perms.IsAuthenticated]
     queryset = Board.objects.all()
@@ -129,11 +101,6 @@ class GetUserBoards(generics.ListAPIView):
         queryset = Board.objects.filter(id_user=host)
         serializer = UserBoardsSerializer(queryset, many=True)
         return Response(serializer.data)
-
-
-class GetBoard(generics.RetrieveAPIView):
-    queryset = Board.objects.select_related('id_user').prefetch_related('members', 'columns', 'columns__tasks')
-    serializer_class = BoardSerializer
 
 
 class UserRegister(APIView):

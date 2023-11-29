@@ -1,15 +1,16 @@
-from django.urls import path
+from django.urls import path, include
 from .views import *
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'boards', BoardViewSet, basename='board')
+router.register(r'columns', ColumnViewSet, basename='column')
+router.register(r'tasks', TaskViewSet, basename='task')
+
 
 urlpatterns = [
-    path('boards/', GetBoards.as_view(), name='board-list'),
-    path('get-board/<int:pk>', GetBoard.as_view(), name='get-board'),
-    path('create-board/', CreateBoardView.as_view(), name='create-board'),
+    path('', include(router.urls)),
     path('user-boards/', GetUserBoards.as_view(), name='user-boards'),
-    path('create-column/', CreateColumnView.as_view(), name='create-column'),
-    path('board-columns/<int:pk>', GetBoardColumns.as_view(), name='board-columns'),
-    path('create-task/', CreateTaskView.as_view(), name='create-task'),
-    path('column-tasks/<int:pk>', GetColumnTasks.as_view(), name='column-tasks'),
     path('logout/', UserLogout.as_view(), name='logout'),
     path('login/', UserLogin.as_view(), name='login'),
     path('register/', UserRegister.as_view(), name='register'),

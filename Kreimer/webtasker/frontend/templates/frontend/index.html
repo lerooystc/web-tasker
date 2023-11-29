@@ -6,7 +6,7 @@
     <title>Title</title>
 </head>
 <body>
-<button id="login" onclick="location.href = 'api/login'">Login</button>
+<button id="login" onclick="location.href = 'api/login/'">Login</button>
 <h1 id="h1">User boards:</h1>
 <div id="boards"></div>
 </body>
@@ -16,7 +16,7 @@
         if (response.status != 403) {
             const login = document.getElementById("login");
             login.innerHTML = "Logout";
-            login.setAttribute('onclick', 'location.href = "api/logout"');
+            login.setAttribute('onclick', 'location.href = "api/logout/"');
             const boards = await response.json();
             const element = document.getElementById("boards");
             const fragment = document.createDocumentFragment();
