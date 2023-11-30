@@ -2,13 +2,27 @@ from rest_framework import serializers
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.models import User
-from .models import Board, Column, Task
+from .models import Board, Column, Task, Note
+
+
+class NoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Note
+        fields = '__all__'
+
+
+class CreateNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Note
+        fields = ('id_board', 'id_task', 'creator', 'title', 'body')
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    notes = NoteSerializer(many=True, read_only=True)
+
     class Meta:
         model = Task
-        fields = ('id', 'id_column', 'title', 'body', 'color', 'priority', 'finish_by', 'taken_by')
+        fields = ('id', 'id_column', 'title', 'body', 'color', 'priority', 'finish_by', 'taken_by', 'notes')
 
 
 class CreateTaskSerializer(serializers.ModelSerializer):
@@ -32,12 +46,13 @@ class CreateColumnSerializer(serializers.ModelSerializer):
 
 
 class BoardSerializer(serializers.ModelSerializer):
+    notes = NoteSerializer(many=True, read_only=True)
     columns = ColumnSerializer(many=True, read_only=True)
 
     class Meta:
         model = Board
         fields = ('id', 'id_user', 'members', 'title', 'description', 'columns',
-                  'invite_code', 'created_at')
+                  'invite_code', 'created_at', 'notes')
 
 
 class CreateBoardSerializer(serializers.ModelSerializer):
@@ -79,4 +94,10 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email', 'username')
+
+
+class UsernameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', )
 

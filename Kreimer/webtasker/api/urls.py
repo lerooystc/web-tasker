@@ -6,6 +6,7 @@ router = DefaultRouter()
 router.register(r'boards', BoardViewSet, basename='board')
 router.register(r'columns', ColumnViewSet, basename='column')
 router.register(r'tasks', TaskViewSet, basename='task')
+router.register(r'notes', NoteViewSet, basename='note')
 
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path('login/', UserLogin.as_view(), name='login'),
     path('register/', UserRegister.as_view(), name='register'),
     path('user/', UserView.as_view(), name='user'),
+    path('username-taken/', UsernameTaken.as_view(), name='username-taken')
 ]

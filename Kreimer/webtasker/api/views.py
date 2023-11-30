@@ -3,7 +3,7 @@ from django.contrib.auth import login, logout
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from rest_framework import generics, status
 from .serializers import *
-from .models import Board, Column, Task
+from .models import Board, Column, Task, Note
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -13,7 +13,8 @@ from rest_framework.response import Response
 
 
 class BoardViewSet(viewsets.ModelViewSet):
-    queryset = Board.objects.select_related('id_user').prefetch_related('members', 'columns', 'columns__tasks')
+    queryset = Board.objects.select_related('id_user').prefetch_related('members', 'notes', 'columns', 'columns__tasks',
+                                                                        'columns__tasks__notes')
     serializer_class = BoardSerializer
     create_serializer_class = CreateBoardSerializer
 
@@ -42,11 +43,12 @@ class BoardViewSet(viewsets.ModelViewSet):
 
 
 class ColumnViewSet(viewsets.ModelViewSet):
-    queryset = Column.objects.prefetch_related('tasks')
-    serializer_class = CreateColumnSerializer
+    queryset = Column.objects.prefetch_related('tasks', 'tasks__notes')
+    serializer_class = ColumnSerializer
+    create_serializer_class = CreateColumnSerializer
 
     def create(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.create_serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
             title = serializer.data.get('title')
             number = serializer.data.get('number')
@@ -65,11 +67,12 @@ class ColumnViewSet(viewsets.ModelViewSet):
 
 
 class TaskViewSet(viewsets.ModelViewSet):
-    queryset = Task.objects.all()
-    serializer_class = CreateTaskSerializer
+    queryset = Task.objects.prefetch_related('notes')
+    serializer = TaskSerializer
+    create_serializer_class = CreateTaskSerializer
 
     def create(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.create_serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
             id_column = serializer.data.get('id_column')
             title = serializer.data.get('title')
@@ -87,6 +90,38 @@ class TaskViewSet(viewsets.ModelViewSet):
                             finish_by=finish_by)
                 task.save()
                 return Response(TaskSerializer(task).data, status=status.HTTP_201_CREATED)
+
+        return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class NoteViewSet(viewsets.ModelViewSet):
+    queryset = Note.objects.select_related('creator')
+    serializer_class = NoteSerializer
+    create_serializer_class = CreateNoteSerializer
+
+    def create(self, request):
+        serializer = self.create_serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            if board := serializer.data.get('id_board'):
+                id_board = get_object_or_404(Board, pk=board)
+                id_task = None
+                flag = 'board'
+            if task := serializer.data.get('id_task'):
+                id_task = get_object_or_404(Task, pk=task)
+                id_board = None
+                flag = 'task'
+            title = serializer.data.get('title')
+            body = serializer.data.get('body')
+            id_user = self.request.user
+            queryset = Note.objects.filter(id_board=id_board) if flag == 'board' else Note.objects.filter(
+                id_task=id_task)
+            if queryset.count() > 29:
+                return Response({'Bad Request': 'Too many notes already exist...'},
+                                status=status.HTTP_400_BAD_REQUEST)
+            else:
+                note = Note(id_board=id_board, id_task=id_task, creator=id_user, title=title, body=body)
+                note.save()
+                return Response(NoteSerializer(note).data, status=status.HTTP_201_CREATED)
 
         return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -142,4 +177,14 @@ class UserView(APIView):
         serializer = UserSerializer(request.user)
         return Response({'user': serializer.data}, status=status.HTTP_200_OK)
 
+
+class UsernameTaken(APIView):
+    permission_classes = [perms.AllowAny]
+    serializers = UsernameSerializer
+
+    def post(self, request):
+        serializer = UsernameSerializer(data=request.data)
+        if serializer.is_valid():
+            return Response({"Username valid": "Username valid."}, status=status.HTTP_200_OK)
+        return Response({'Username taken': 'User already exists...'}, status=status.HTTP_400_BAD_REQUEST)
 
