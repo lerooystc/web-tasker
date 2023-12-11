@@ -160,7 +160,7 @@ class UserLogin(APIView):
         if serializer.is_valid(raise_exception=True):
             user = serializer.check_user(request.data)
             login(request, user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({"Token": Token.objects.get_or_create(user=user)[0].key}, status=status.HTTP_200_OK)
 
 
 class UserLogout(APIView):

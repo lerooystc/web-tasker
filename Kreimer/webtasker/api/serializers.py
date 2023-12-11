@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
 from .models import Board, Column, Task, Note
 
 
@@ -76,6 +77,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user_obj = User.objects.create_user(email=validated_data['email'], username=validated_data['username'],
                                             password=validated_data['password'])
         user_obj.save()
+        token = Token.objects.create(user=user_obj)
         return user_obj
 
 

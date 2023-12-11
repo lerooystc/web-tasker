@@ -25,7 +25,6 @@ SECRET_KEY = 'django-insecure-l(%^yb+8#p)kxd12=a=+$4-*jk8wki)&1o*+srwyn_p2k1e_j0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
@@ -38,6 +37,7 @@ INSTALLED_APPS = [
     'api',
     'frontend',
     'rest_framework',
+    'rest_framework.authtoken',
     'debug_toolbar',
     'corsheaders',
 ]
@@ -56,7 +56,16 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'webtasker.urls'
 
-CORS_ALLOW_ALL_ORIGINS = True
+ALLOWED_HOSTS = ["localhost", "192.168.0.102", "127.0.0.1", "hoofeddragon417.pythonanywhere.com"]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:8080', 'http://192.168.0.102:8080', 'http://127.0.0.1:8080')
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8080', 'http://192.168.0.102:8080', 'http://127.0.0.1:8080'
+]
 
 TEMPLATES = [
     {
@@ -146,3 +155,9 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',  # <-- And here
+    ],
+}
