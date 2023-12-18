@@ -61,7 +61,8 @@ ALLOWED_HOSTS = ["localhost", "192.168.0.102", "127.0.0.1", "hoofeddragon417.pyt
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ORIGIN_WHITELIST = (
-    'http://localhost:8080', 'http://192.168.0.102:8080', 'http://127.0.0.1:8080')
+    'http://localhost:8080', 'http://192.168.0.102:8080', 'http://127.0.0.1:8080'
+)
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8080', 'http://192.168.0.102:8080', 'http://127.0.0.1:8080'
@@ -90,9 +91,13 @@ WSGI_APPLICATION = 'webtasker.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        'NAME': 'noteclip',
+        'USER': 'postgres',
+        'PASSWORD': '1231231',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
 

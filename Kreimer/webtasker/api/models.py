@@ -39,6 +39,7 @@ class Task(models.Model):
     id_column = models.ForeignKey("Column", related_name='tasks', on_delete=models.CASCADE)
     title = models.CharField(max_length=50, default="default_for_now")
     body = models.TextField(max_length=200, default="default_for_now")
+    order = models.IntegerField(default=0)
     color = models.IntegerField()
     priority = models.IntegerField()
     finish_by = models.DateTimeField()

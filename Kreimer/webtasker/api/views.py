@@ -68,7 +68,7 @@ class ColumnViewSet(viewsets.ModelViewSet):
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.prefetch_related('notes')
-    serializer = TaskSerializer
+    serializer_class = TaskSerializer
     create_serializer_class = CreateTaskSerializer
 
     def create(self, request):
