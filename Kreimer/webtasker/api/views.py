@@ -28,7 +28,7 @@ class BoardViewSet(viewsets.ModelViewSet):
             description = serializer.data.get('description')
             id_user = self.request.user
             queryset = Board.objects.filter(id_user=id_user)
-            if queryset.count() > 2:
+            if queryset.count() > 7:
                 return Response({'Bad Request': 'Too many boards already exist...'}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 board = Board(id_user=id_user, title=title,
@@ -133,7 +133,7 @@ class GetUserBoards(generics.ListAPIView):
 
     def list(self, request):
         host = self.request.user
-        queryset = Board.objects.filter(id_user=host)
+        queryset = Board.objects.filter(members=host)
         serializer = UserBoardsSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -188,3 +188,19 @@ class UsernameTaken(APIView):
             return Response({"Username valid": "Username valid."}, status=status.HTTP_200_OK)
         return Response({'Username taken': 'User already exists...'}, status=status.HTTP_400_BAD_REQUEST)
 
+
+class JoinBoard(APIView):
+    def post(self, request):
+        board = Board.objects.get(invite_code=request.data['invite_code'])
+        if board:
+            board.members.add(request.user)
+            return Response({"User added": "User added to the board members."}, status=status.HTTP_200_OK)
+        return Response({"Bad Request": "User couldn't be added."}, status=status.HTTP_400_BAD_REQUEST)
+
+class LeaveBoard(APIView):
+    def post(self, request):
+        board = Board.objects.get(id=request.data['id_board'])
+        if board:
+            board.members.remove(request.user)
+            return Response({"User removed": "User left the board."}, status=status.HTTP_200_OK)
+        return Response({"Bad Request": "User couldn't be removed."}, status=status.HTTP_400_BAD_REQUEST)

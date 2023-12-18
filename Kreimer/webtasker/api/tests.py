@@ -1,3 +1,1 @@
-from django.test import TestCase
-
-# Create your tests here.
+# TODO: REWRITE ALL THE TESTS DUMBASS

@@ -102,4 +102,3 @@ class UsernameSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', )
-

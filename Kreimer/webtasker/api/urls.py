@@ -16,5 +16,7 @@ urlpatterns = [
     path('login/', UserLogin.as_view(), name='login'),
     path('register/', UserRegister.as_view(), name='register'),
     path('user/', UserView.as_view(), name='user'),
-    path('username-taken/', UsernameTaken.as_view(), name='username-taken')
+    path('username-taken/', UsernameTaken.as_view(), name='username-taken'),
+    path('join-board/', JoinBoard.as_view(), name='join-board'),
+    path('leave-board/', LeaveBoard.as_view(), name='leave-board'),
 ]
