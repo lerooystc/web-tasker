@@ -61,11 +61,13 @@ ALLOWED_HOSTS = ["localhost", "192.168.0.102", "127.0.0.1", "hoofeddragon417.pyt
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ORIGIN_WHITELIST = (
-    'http://localhost:8080', 'http://192.168.0.102:8080', 'http://127.0.0.1:8080'
+    'http://localhost:8080', 'http://192.168.0.102:8080', 'http://127.0.0.1:8080',
+    'https://glittering-swan-9c0d8e.netlify.app'
 )
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:8080', 'http://192.168.0.102:8080', 'http://127.0.0.1:8080'
+    'http://localhost:8080', 'http://192.168.0.102:8080', 'http://127.0.0.1:8080',
+    'https://glittering-swan-9c0d8e.netlify.app'
 ]
 
 TEMPLATES = [

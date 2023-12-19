@@ -65,6 +65,26 @@ class ColumnViewSet(viewsets.ModelViewSet):
 
         return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
 
+    def partial_update(self, request, pk):
+        if request.data['number']:
+            column = Column.objects.get(id=pk)
+            a = int(column.number)
+            b = int(request.data['number'])
+            if a > b:
+                for i in range(a - 1, b - 1, -1):
+                    ncol = Column.objects.get(id_board=column.id_board, number=i)
+                    ncol.number = ncol.number + 1
+                    ncol.save()
+            else:
+                for i in range(a + 1, b + 1):
+                    ncol = Column.objects.get(id_board=column.id_board, number=i)
+                    ncol.number = ncol.number - 1
+                    print(ncol.id, ncol.number)
+                    ncol.save()
+            column.number = b
+            column.save()
+        return super().partial_update(request, pk)
+
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.prefetch_related('notes')
