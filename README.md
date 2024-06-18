@@ -1,2 +1,2 @@
-#Basic Kanban copy.
+# Basic Kanban copy.
 Backend's done in Python + DRF.
