@@ -97,6 +97,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             id_column = serializer.data.get('id_column')
             title = serializer.data.get('title')
             body = serializer.data.get('body')
+            order = serializer.data.get('order')
             color = serializer.data.get('color')
             priority = serializer.data.get('priority')
             finish_by = serializer.data.get('finish_by')
@@ -106,7 +107,7 @@ class TaskViewSet(viewsets.ModelViewSet):
                 return Response({'Bad Request': 'Too many tasks already exist...'},
                                 status=status.HTTP_400_BAD_REQUEST)
             else:
-                task = Task(id_column=column, title=title, body=body, color=color, priority=priority,
+                task = Task(id_column=column, title=title, body=body, order=order, color=color, priority=priority,
                             finish_by=finish_by)
                 task.save()
                 return Response(TaskSerializer(task).data, status=status.HTTP_201_CREATED)

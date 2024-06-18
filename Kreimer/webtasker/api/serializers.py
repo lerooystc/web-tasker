@@ -23,13 +23,13 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = ('id', 'id_column', 'title', 'body', 'color', 'priority', 'finish_by', 'taken_by', 'notes')
+        fields = '__all__'
 
 
 class CreateTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ('id_column', 'title', 'body', 'color', 'priority', 'finish_by')
+        fields = ('id_column', 'title', 'body', 'order', 'color', 'priority', 'finish_by')
 
 
 class ColumnSerializer(serializers.ModelSerializer):
